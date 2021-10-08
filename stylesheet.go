@@ -47,6 +47,10 @@ func (s *Stylesheet) Compile() string {
 		}
 		sb.WriteString("\n/* ")
 		sb.WriteString(rule.genesis())
+		if len(rule.comment) > 0 {
+			sb.WriteRune(' ')
+			sb.WriteString(rule.comment)
+		}
 		sb.WriteString(" */\n")
 		selectors := strings.Join(rule.selectors, ",\n")
 		sb.WriteString(selectors)
@@ -93,6 +97,7 @@ func (s *Stylesheet) updateOrCreateTraitRule(selector string, path []string) {
 			selector,
 		},
 		declarations: trait.declarations,
+		comment:      strings.Join(path, "/"),
 	}
 	s.rules = append(s.rules, rule)
 	s.traitRules[len(s.rules)-1] = path

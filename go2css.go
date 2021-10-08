@@ -5,6 +5,7 @@ type (
 		genesisID    int
 		selectors    []string
 		declarations []*Declaration
+		comment      string
 	}
 	Declaration struct {
 		property string
