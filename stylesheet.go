@@ -81,24 +81,22 @@ outer:
 	}
 	return nil, false
 }
-func (s *Stylesheet) updateOrCreateTraitRule(selector string, path []string) {
-	rule, ok := s.traitRule(path)
-	if ok {
-		rule.selectors = append(rule.selectors, selector)
-		return
+func (s *Stylesheet) includeTrait(path []string) *Rule {
+	rule, exists := s.traitRule(path)
+	if exists {
+		return rule
 	}
 	trait, err := s.universe.trait(path)
 	if err != nil {
 		panic(err)
 	}
 	rule = &Rule{
-		genesisID: TRAIT_RULE_GENESIS_ID,
-		selectors: []string{
-			selector,
-		},
+		genesisID:    TRAIT_RULE_GENESIS_ID,
+		selectors:    []string{},
 		declarations: trait.declarations,
 		comment:      strings.Join(path, "/"),
 	}
 	s.rules = append(s.rules, rule)
 	s.traitRules[len(s.rules)-1] = path
+	return rule
 }

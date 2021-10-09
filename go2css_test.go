@@ -28,6 +28,13 @@ var _ = Describe("go2css", func() {
 							m.Component("title", func(c *ComponentConfigurator) {
 								c.D("font-size", "3em")
 								c.D("font-weight", "600")
+								c.D("background-color", "red")
+							})
+							m.Modifier("normal", func(m *ModifierConfigurator) {
+								m.D("border-color", "white")
+							})
+							m.State("complited", func(s *StateConfigurator) {
+								s.Has([]string{"global", "widget"})
 							})
 						})
 						s.Module("nav", func(m *ModuleConfigurator) {
@@ -45,7 +52,7 @@ var _ = Describe("go2css", func() {
 				s, err := u.Stylesheet("test")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(s).NotTo(BeNil())
-				Expect(s.Compile()).To(Equal("\n/* trait global/widget */\n.header {\n\tbackground-color: #e5e6e7;\n\tborder-width: 1px;\n\tborder-color: #a5a6a7;\n\tborder-style: solid;\n\tpadding: 2em;\n\t}\n/* component */\n.header-title {\n\tfont-size: 3em;\n\tfont-weight: 600;\n\t}\n/* trait global/link */\n.nav-link {\n\tcolor: #0033ff;\n\ttext-decoration: underline;\n\t}\n/* module */\n.nav {\n\tborder-width: 1px;\n\tborder-color: #000000;\n\tborder-style: solid;\n\tpadding: 1em;\n\t}"))
+				Expect(s.Compile()).To(Equal("\n/* trait global/widget */\n.header,\n.header-complited {\n\tbackground-color: #e5e6e7;\n\tborder-width: 1px;\n\tborder-color: #a5a6a7;\n\tborder-style: solid;\n\tpadding: 2em;\n\t}\n/* modifier */\n.header-normal {\n\tborder-color: white;\n\t}\n/* component */\n.header-title {\n\tfont-size: 3em;\n\tfont-weight: 600;\n\tbackground-color: red;\n\t}\n/* trait global/link */\n.nav-link {\n\tcolor: #0033ff;\n\ttext-decoration: underline;\n\t}\n/* module */\n.nav {\n\tborder-width: 1px;\n\tborder-color: #000000;\n\tborder-style: solid;\n\tpadding: 1em;\n\t}"))
 			})
 		})
 	})

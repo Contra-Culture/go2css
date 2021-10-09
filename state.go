@@ -1,10 +1,13 @@
 package go2css
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type (
 	StateConfigurator struct {
 		rule       *Rule
+		traitRules []*Rule
 		stylesheet *Stylesheet
 		nested     map[string]*Rule
 	}
@@ -43,5 +46,36 @@ func (cfg *StateConfigurator) D(property string, value string) {
 	cfg.rule.declarations = append(cfg.rule.declarations, newDeclaration)
 }
 func (cfg *StateConfigurator) Has(path []string) {
-	cfg.stylesheet.updateOrCreateTraitRule(cfg.rule.selectors[0], path)
+	rule := cfg.stylesheet.includeTrait(path)
+	for _, newDeclaration := range rule.declarations {
+		for _, oldDeclaration := range cfg.rule.declarations {
+			if newDeclaration.property == oldDeclaration.property {
+				panic(
+					fmt.Sprintf(
+						"declaration \"%s\" already exists. old: %s | new: %s",
+						newDeclaration.property,
+						oldDeclaration.value,
+						newDeclaration.value,
+					))
+			}
+		}
+		for _, previousTraitRule := range cfg.traitRules {
+			for _, oldDeclaration := range previousTraitRule.declarations {
+				if newDeclaration.property == oldDeclaration.property {
+					panic(
+						fmt.Sprintf(
+							"declaration \"%s\" already exists. old: \"%s\" from trait \"%s\" | new: \"%s\" from trait \"%s\"",
+							newDeclaration.property,
+							oldDeclaration.value,
+							previousTraitRule.comment,
+							newDeclaration.value,
+							rule.comment,
+						),
+					)
+				}
+			}
+		}
+	}
+	rule.selectors = append(rule.selectors, cfg.rule.selectors[0])
+	cfg.traitRules = append(cfg.traitRules, rule)
 }
